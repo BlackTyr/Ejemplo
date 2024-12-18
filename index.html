@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Turnos - Año 2025</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .trabajo {
+            background-color: #008080;
+        }
+
+        .descanso {
+            background-color: #FF2400;
+        }
+
+        .noche {
+            background-color: #A9A9A9;
+        }
+
+        .incapacidad {
+            background-color: #B0C4DE;
+        }
+
+        .seleccionado {
+            background-color: #9966CC;
+        }
+
+        .cubrir {
+            background-color: #FF7F00;
+        }
+
+        .tiempoextra {
+            background-color: #FFDB58;
+        }
+
+        .vacaciones {
+            background-color: #FFD700; /* Color dorado para vacaciones */
+        }
+
+        .incapacidad {
+            background-color: #B0C4DE; /* Color azul bajo para incapacidad */
+        }
+
+        .tiempoextra {
+            background-color: #FFDB58; /* Color amarillo para tiempo extra */
+        }
+
+        .cubre {
+            background-color: #FF7F00; /* Color naranja para cubre */
+        }
+
+        tr:hover {
+            background-color: rgba(224, 224, 224, 0.5);
+        }
+
+        .analista {
+            background-color: transparent;
+        }
+
+        /* Clases para el texto */
+        .texto-trabajo {
+            color: #008080 /* Color blanco por defecto */
+        }
+
+        .texto-descanso {
+            color: #FFFFFF; /* Color blanco por defecto */
+        }
+
+        .texto-noche {
+            color: #000000; /* Color negro por defecto */
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendario de Turnos - ASCENTY DC MX1</h1>
+    <label for="analista-select">Filtrar por analista:</label>
+    <select id="analista-select">
+        <option value="todos">Todos</option>
+        <option value="Oscar Cervantes">Oscar Cervantes</option>
+        <option value="Jacinto Trejo">Jacinto Trejo</option>
+        <option value="Juan Carlos Zarate">Juan Carlos Zarate</option>
+        <option value="Efrain Carmona">Efrain Carmona</option>
+        <option value="Victor Prado">Victor Prado</option>
+        <option value="Alexis Mejia">Alexis Mejia</option>
+        <option value="Alejandro Ramirez">Alejandro Ramirez</option>
+        <option value="Jorge Cisneros">Jorge Cisneros</option>
+        <option value="Moises Hernandez">Moises Hernandez</option>
+        <option value="Analista 11">Analista 11</option>
+        <option value="Analista 12">Analista 12</option>
+    </select>
+    <button id="export-btn">Exportar a CSV</button>
+    <script>
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const diasPorMes = [
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes","Martes", "Miércoles", "Jueves", "Viernes","Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes","Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes","Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            ["Día", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        ];
+        const turnosEjemplo = [
+            ["trabajo", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"]
+        ];
+const turnosEjemplo1 = [
+            ["trabajo", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"]
+        ];
+const turnosEjemplo2 = [
+            ["trabajo", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"]
+        ];
+const turnosEjemplo3 = [
+            ["trabajo", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"],
+            ["trabajo", "descanso", "noche", "trabajo", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "noche", "trabajo", "noche", "descanso", "trabajo", "trabajo", "noche", "descanso", "descanso"]
+        ];
+       
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+
+            meses.forEach((mes, index) => {
+                const h2 = document.createElement('h2');
+                h2.textContent = mes + " 2025";
+                container.appendChild(h2);
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const tbody = document.createElement('tbody');
+
+                // Encabezados de días de la semana
+                const headers = diasPorMes[index];
+                const headerRow = document.createElement('tr');
+                headers.forEach((header) => {
+                    const th = document.createElement('th');
+                    th.scope = "col";
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+
+                // Encabezados de días del mes
+                const dayHeaderRow = document.createElement('tr');
+                for (let i = 0; i < 32; i++) {
+                    const th = document.createElement('th');
+                    th.textContent = i === 0 ? "Analista" : i;
+                    dayHeaderRow.appendChild(th);
+                }
+                thead.appendChild(dayHeaderRow);
+
+                // Filas de analistas y sus turnos
+                const analistas = [
+                    { nombre: "Oscar Cervantes", turnos: turnosEjemplo[index] },
+                    { nombre: "Jacinto Trejo", turnos: turnosEjemplo[index] },
+                    { nombre: "Juan Carlos Zarate", turnos: turnosEjemplo1[index] },
+                    { nombre: "Efrain Carmona", turnos: turnosEjemplo1[index] },
+                    { nombre: "Victor Prado", turnos: turnosEjemplo2[index] },
+                    { nombre: "Alexis Mejia", turnos: turnosEjemplo2[index] },
+                    { nombre: "Alejandro Ramirez", turnos: turnosEjemplo3[index] },
+                    { nombre: "Jorge Cisneros", turnos: turnosEjemplo3[index] },
+                    { nombre: "Moises Hernandez", turnos: turnosEjemplo[index] },
+                    { nombre: "Analista 11", turnos: turnosEjemplo[index] },
+                    { nombre: "Analista 12", turnos: turnosEjemplo[index] }
+                ];
+
+                analistas.forEach(analista => {
+                    const row = document.createElement('tr');
+                    const analistaCell = document.createElement('td');
+                    analistaCell.textContent = analista.nombre;
+                    analistaCell.className = "analista";
+                    row.appendChild(analistaCell);
+
+                    analista.turnos.forEach(turno => {
+                        const td = document.createElement('td');
+                        td.className = turno;
+                        const span = document.createElement('span');
+                        span.className = `texto-${turno}`;
+                        span.textContent = turno.charAt(0).toUpperCase() + turno.slice(1); // Mostrar el turno en palabras
+                        td.appendChild(span);
+                        row.appendChild(td);
+                    });
+                    tbody.appendChild(row);
+
+                    // Fila extra vacía con nombres guardados
+                    const filaExtra = document.createElement('tr');
+                    analista.turnos.forEach((_, cellIndex) => {
+                        const td = document.createElement('td');
+                        const nombreGuardado = localStorage.getItem(`nombre_${analista.nombre}_${mes}_${cellIndex}`) || "   ";
+                        td.textContent = nombreGuardado; // Mostrar el nombre guardado o mensaje por defecto
+                        // Aplicar clase según el contenido
+                        if (nombreGuardado.toLowerCase().includes("vacaciones")) {
+                            td.classList.add('vacaciones');
+                        } else if (nombreGuardado.toLowerCase().includes("tiempo extra")) {
+                            td.classList.add('tiempoextra');
+                        } else if (nombreGuardado.toLowerCase().includes("cubre")) {
+                            td.classList.add('cubrir');
+                        } else if (nombreGuardado.toLowerCase().includes("incapacidad")) {
+                            td.classList.add('incapacidad');
+                        }
+                        filaExtra.appendChild(td);
+                    });
+                    tbody.appendChild(filaExtra);
+
+                    // Fila adicional con inputs y botones de guardado
+                    const filaAdicional = document.createElement('tr');
+
+                    analista.turnos.forEach((_, cellIndex) => {
+                        const td = document.createElement('td');
+                        if (cellIndex > 0) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.placeholder = 'Ingresa tu nombre';
+                            td.appendChild(input);
+
+                            const saveButton = document.createElement('button');
+                            saveButton.textContent = '   ';
+                            saveButton.addEventListener('click', () => {
+                                const nombre = input.value;
+                                localStorage.setItem(`nombre_${analista.nombre}_${mes}_${cellIndex}`, nombre); // Guardar el nombre en localStorage
+                                filaExtra.cells[cellIndex].textContent = nombre; // Mostrar el nombre en la celda correspondiente de filaExtra
+                                // Eliminar clases de color previas
+                                filaExtra.cells[cellIndex].classList.remove('vacaciones', 'tiempoextra', 'cubrir', 'incapacidad');
+                                // Aplicar clase según el contenido
+                                if (nombre.toLowerCase().includes("vacaciones")) {
+                                    filaExtra.cells[cellIndex].classList.add('vacaciones');
+                                } else if (nombre.toLowerCase().includes("tiempo extra")) {
+                                    filaExtra.cells[cellIndex].classList.add('tiempoextra');
+                                } else if (nombre.toLowerCase().includes("cubre")) {
+                                    filaExtra.cells[cellIndex].classList.add('cubrir');
+                                } else if (nombre.toLowerCase().includes("incapacidad")) {
+                                    filaExtra.cells[cellIndex].classList.add('incapacidad');
+                                }
+                            });
+                            td.appendChild(saveButton);
+                        }
+                        filaAdicional.appendChild(td);
+                    });
+                    tbody.appendChild(filaAdicional);
+
+                    // Fila de espacio
+                    const filaEspacio = document.createElement('tr');
+                    const tdEspacio = document.createElement('td');
+                    tdEspacio.colSpan = 9;
+                    tdEspacio.textContent = "";
+                    filaEspacio.appendChild(tdEspacio);
+                    tbody.appendChild(filaEspacio);
+                });
+
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                container.appendChild(table);
+            });
+
+            // Función para convertir la tabla a CSV
+            function tableToCSV() {
+                const rows = document.querySelectorAll('table tr');
+                let csvContent = '';
+                rows.forEach(row => {
+                    const cols = row.querySelectorAll('td, th');
+                    const rowData = [];
+                    cols.forEach(col => {
+                        rowData.push(col.textContent);
+                    });
+                    csvContent += rowData.join(',') + '\n';
+                });
+                return csvContent;
+            }
+
+            // Evento para el botón de exportar
+            document.getElementById('export-btn').addEventListener('click', () => {
+                const csvContent = tableToCSV();
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'calendario_turnos_2025.csv';
+                link.click();
+            });
+
+            // Función para filtrar por analista
+            document.getElementById('analista-select').addEventListener('change', function() {
+                const selectedAnalista = this.value;
+                const tables = document.querySelectorAll('table');
+
+                tables.forEach(table => {
+                    const rows = table.querySelectorAll('tbody tr');
+                    let showRow = false;
+                    rows.forEach((row, index) => {
+                        const analistaCell = row.querySelector('td.analista');
+                        if (analistaCell) {
+                            const analistaName = analistaCell.textContent;
+                            if (selectedAnalista === 'todos' || analistaName === selectedAnalista) {
+                                row.style.display = '';
+                                showRow = true;
+                            } else {
+                                row.style.display = 'none';
+                                showRow = false;
+                            }
+                        } else if (showRow && (index % 2 === 1)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = selectedAnalista === 'todos' ? '' : 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
